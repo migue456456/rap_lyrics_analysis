@@ -1,47 +1,48 @@
 import re
 from spacy.lang.en.stop_words import STOP_WORDS
 
-stop_words = {w.replace("'", "") for w in STOP_WORDS}
+class TextCleaner:
+    """
+    A class to handle loading, cleaning, tokenizing, and analyzing text data.
+    Attributes:
+        stop_words (set): a set of English stop words for filtering
+    """
 
-def load_text(path):
-    with open(path, "r") as f:
-        return f.read()
+    def __init__(self):
+        # Prepare stop words set and remove apostrophes
+        self.stop_words = {w.replace("'", "") for w in STOP_WORDS}
 
-def clean_text(text):
-    text = text.replace("'", "")
-    text = text.replace("-", "")
-    text = text.replace(".", "")
-    text = text.lower()
+    def load_text(self, path):
+        """
+        Loads a text file and returns its content as a string.
+        Args:
+            path (str): Path to the text file
+        Returns:
+            str: Raw text from the file
+        """
+        with open(path, "r") as f:
+            return f.read()
 
-    # replacements
-    text = text.replace("nigga", "fella")
-    text = text.replace("niggas", "fellas")
-    text = text.replace("hoe", "fox")
-    text = text.replace("hoes", "foxs")
+    def clean_text(self, text):
+        """
+        Cleans text by removing punctuation, lowering case,
+        and applying specific word replacements.
+        Args:
+            text (str): The raw text
+        Returns:
+            str: Cleaned text
+        """
+        text = text.replace("'", "")
+        text = text.replace("-", "")
+        text = text.replace(".", "")
+        text = text.lower()
 
-    return text
+        # Specific replacements for sensitive or slang terms
+        text = text.replace("nigga", "fella")
+        text = text.replace("niggas", "fellas")
+        text = text.replace("hoe", "fox")
+        text = text.replace("hoes", "foxs")
 
-def tokenize(text):
-    return re.findall(r"[a-z]+", text)
+        return text
 
-def count_words(tokens):
-    counts = {}
-    for t in tokens:
-        counts[t] = counts.get(t, 0) + 1
-    return counts
-
-def remove_stopwords(word_counts):
-    return {w: c for w, c in word_counts.items() if w not in stop_words}
-
-def longest_word(word_counts):
-    return max(word_counts.keys(), key=len)
-
-def total_words(word_counts):
-    return sum(word_counts.values())
-
-def unique_words(word_counts):
-    return [w for w, c in word_counts.items() if c == 1]
-
-def avg_word_length(word_counts):
-    total_chars = sum(len(w) * c for w, c in word_counts.items())
-    return total_chars / total_words(word_counts)
+    def tokenize(self, text):
